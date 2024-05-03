@@ -1,3 +1,6 @@
+> [!WARNING]
+> This project is working on progress.
+
 # migr
 small command to migrate rdb schema written in posix shellscript.
 
