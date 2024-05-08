@@ -44,6 +44,19 @@ apply new migrations
 cakstjdq2a create-user-table.sql ................. ok
 ```
 
+# Why?
+Currently, there are numerous database migration tools available, such as [MyBatis Migration](https://github.com/mybatis/migrations), [liquibase](https://github.com/liquibase/liquibase), [Flyway](https://github.com/flyway/flyway), [phpmig](https://github.com/davedevelopment/phpmig), [migrate](https://github.com/golang-migrate/migrate) ...
+
+All these projects boast impressive features like supporting multiple databases, defining original DSL, and schema auto-generation, among others. So why would I create a new, less-featured, slow, and clumsy migration tool?
+
+To address this question, let me pose a few of my own:
+
+- How long do you expect your data to remain relevant? More than 10 years? 50 years? Perhaps even a century? If so, can you confidently affirm that these migration tools will endure beyond the lifespan of your data?
+- Should the maintainers of these tools abandon the project, are you equipped to step in and manage it independently to ensure the continuity of your data for future migrations?
+- Is your project truly in need of these advanced features?
+
+If your response to all these inquiries is a resounding "yes," then migr might not be the most suitable option for you. Instead, you might want to consider opting for more comprehensive and high-quality migration tools. However, if not, migr could present itself as a viable choice due to its simplicity and ease of personal maintenance.
+
 # Usage
 
 migr have 4 basic operation commands.
