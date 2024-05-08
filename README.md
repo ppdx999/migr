@@ -64,8 +64,24 @@ migr have 4 basic operation commands.
 ```txt
 migr-init    ......................... initial setup for migr
 migr-new     ......................... create new migration file
-migr-commit  ......................... register new migration file to the master file
-migr-apply   ......................... upgrade your database to the latest
+migr-up      ......................... upgrade your database to the latest
+migr-redo    ......................... redo latest migration
 ```
 
-TODO: Describe the each command details.
+## migr-init
+
+- create migration management table to your database.
+- create a dir locally to store migration files.
+
+## migr-new
+
+- create new migration file
+- its file name structure is `{timestamp}_{id}_{up|down}_{title}.sql`
+
+## migr-up
+
+- upgrade your database to the latest
+
+## migr-redo
+
+- apply latest down-migration, then apply latest up-migration
