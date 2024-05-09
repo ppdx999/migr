@@ -10,10 +10,8 @@ export UNIX_STD=2003  # to make HP-UX conform to POSIX
 
 print_usage_exit() {
   cat <<-USAGE 1>&2
-initial setup for migr
-
-Usage   : ${0##*/} [options]
-Options : -d <dir>|--dir=<dir>                Directory to store the migration
+Usage   : ${0##*/} <psql|mysql|sqlite3> [options]
+Options : -d <dir>|--dir=<dir>                Directory to store the migration file
         : -h <host>|--host=<host>             Database host
         : -p <port>|--port=<port>             Database port
         : -d <dbname>|--dbname=<dbname>       Database name

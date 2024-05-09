@@ -14,8 +14,8 @@ trap 'rm -rf $tmp' 0 1 2 3 15
 
 print_usage_exit() {
   cat <<-USAGE 1>&2
-Usage   : ${0##*/} [options]
-Options : -d <dir>|--dir=<dir>                Directory to store the migration
+Usage   : ${0##*/} <psql|mysql|sqlite3> [options]
+Options : -d <dir>|--dir=<dir>                Directory to store the migration file
         : -h <host>|--host=<host>             Database host
         : -p <port>|--port=<port>             Database port
         : -d <dbname>|--dbname=<dbname>       Database name
