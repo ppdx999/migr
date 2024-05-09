@@ -1,6 +1,3 @@
-> [!WARNING]
-> This project is working on progress.
-
 # migr
 small command to migrate rdb schema written in posix shellscript.
 
@@ -54,12 +51,14 @@ If your response to all these inquiries is a resounding "yes," then migr might n
 
 # Usage
 
-migr have 4 basic operation commands.
-
 ```txt
 migr-init     ........................ initial setup for migr
 migr-new      ........................ create new migration file
 migr-up       ........................ upgrade your database to the latest
 migr-cancel   ........................ cancel the most latest migration
-migr-status   ........................ print difference between fs and db
+migr-status   ........................ print migr's status
 ```
+
+# Warning
+
+`migr` only support postgresql for now.
