@@ -1,0 +1,110 @@
+#!/bin/sh
+
+# --- Initialize -----------------------------------------------------
+set -u
+umask 0022
+export LC_ALL=C
+export PATH="$(command -p getconf PATH 2>/dev/null)${PATH+:}${PATH-}"
+case $PATH in :*) PATH=${PATH#?};; esac
+export UNIX_STD=2003  # to make HP-UX conform to POSIX
+
+tmp=migr-up-$$
+mkdir $tmp
+trap 'rm -rf $tmp' 0 1 2 3 15
+
+print_usage_exit() {
+  cat <<-USAGE 1>&2
+Usage   : ${0##*/} [options]
+Options : -d <dir>|--dir=<dir>                Directory to store the migration
+        : -h <host>|--host=<host>             Database host
+        : -p <port>|--port=<port>             Database port
+        : -d <dbname>|--dbname=<dbname>       Database name
+        : -u <user>|--user=<user>             Database user
+        : -p <password>|--password=<password> Database password
+Version : 2024-05-02
+USAGE
+  exit 1
+}
+
+
+# --- Parse Options -------------------------------------------------
+case ${1:-} in -h|--help) print_usage_exit;; esac
+cmd=$1
+dir=migr
+host=localhost
+port=
+dbname=
+user=$(whoami)
+password=password
+
+case $cmd in
+  psql)
+    port=5432 ;;
+  mysql)
+    port=3306 ;;
+  sqlite3) :  ;;
+  *) error_exit "Unknown command: $cmd";;
+esac
+shift
+
+while [ $# -gt 0 ]; do
+  case $1 in
+    --dir=*)       dir=${1#*=}     ; shift 1;;
+    -h)            host=$2         ; shift 2;;
+    --host=*)      host=${1#*=}    ; shift 1;;
+    -p)            port=$2         ; shift 2;;
+    --port=*)      port=${1#*=}    ; shift 1;;
+    -d)            dbname=$2       ; shift 2;;
+    --dbname=*)    dbname=${1#*=}  ; shift 1;;
+    -u)            user=$2         ; shift 2;;
+    --user=*)      user=${1#*=}    ; shift 1;;
+    -w)            password=$2     ; shift 2;;
+    --password=*)  password=${1#*=}; shift 1;;
+    --) shift; break;;
+    -*) echo "Unknown option: $1" 1>&2; exit 1;;
+    *) break;;
+  esac
+done
+
+# --- Main -----------------------------------------------------------
+
+case $cmd in
+  psql)
+    latest_id=$(PGPASSWORD=$password psql -Aqt -h $host -p $port -U $user -d $dbname -c '
+        select id from migr order by id desc limit 1;' | head -1)
+    ;;
+  mysql)
+    error_exit "Not implemented yet"
+    ;;
+  sqlite3)
+    error_exit "Not implemented yet"
+    ;;
+esac
+
+down_file=$(find $dir -type f -name "*-${latest_id}-*-down.sql" | head -1)
+printf "  %s ........ " $down_file
+
+  # Apply migration
+  cat > $tmp/down.sql <<-SQL
+BEGIN;
+DELETE FROM migr WHERE id = '$latest_id';
+$(cat $down_file)
+COMMIT;
+SQL
+
+case $cmd in
+    psql)
+    PGPASSWORD=$password psql -Aqt -h $host -p $port -U $user -d $dbname -f $tmp/down.sql
+    ;;
+    mysql)
+    error_exit "Not implemented yet"
+    ;;
+    sqlite3)
+    error_exit "Not implemented yet"
+    ;;
+esac
+
+printf "ok\n"
+
+# --- Done -----------------------------------------------------------
+exit 1

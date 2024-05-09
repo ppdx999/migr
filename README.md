@@ -60,8 +60,7 @@ migr have 4 basic operation commands.
 migr-init     ........................ initial setup for migr
 migr-new      ........................ create new migration file
 migr-up       ........................ upgrade your database to the latest
-migr-amend    ........................ cancel the most latest migration
-migr-redo     ........................ redo latest migration
+migr-cancel   ........................ cancel the most latest migration
 migr-outdated ........................ check your database is latest or not
 ```
 

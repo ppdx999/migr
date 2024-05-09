@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS users (
 EOF
 
 cat > "$create_user_down_mig_files" <<EOF
-DROP TABLE user;
+DROP TABLE users;
 EOF
 
 printf "=============================================================\n"
@@ -183,3 +183,31 @@ count=$(PGPASSWORD=password psql \
     -c 'SELECT count(*) FROM information_schema.columns WHERE table_name = '\''users'\'' AND column_name = '\''created_at'\'';' )
 
 [ $count -eq 1 ] || ng ; ok
+
+printf "=============================================================\n"
+printf "Testing migr-cancel\n"
+printf "=============================================================\n"
+
+printf "Execute migr-cancel... "
+
+./migr-cancel \
+    psql \
+    --host=$host \
+    --port=$port \
+    --dbname=$dbname \
+    --user=$user \
+    --password=password 2>/dev/null 1>/dev/null
+
+[ $? -eq 1 ] || ng ; ok
+
+printf "Checking if the table users does not exist in the database... "
+
+count=$(PGPASSWORD=password psql \
+    -Atq \
+    -U $user \
+    --host=$host \
+    --port=$port \
+    -d $dbname \
+    -c 'SELECT count(*) FROM information_schema.tables WHERE table_name = '\''users'\'';' )
+
+[ $count -eq 0 ] || ng ; ok
