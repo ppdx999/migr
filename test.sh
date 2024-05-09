@@ -24,7 +24,7 @@ psql  -U $user --host=localhost --port=5432 -d test_migr -c 'drop table migr;'
 rm -rf migr
 
 printf "=============================================================\n"
-printf "Testing migr-init"
+printf "Testing migr-init\n"
 printf "=============================================================\n"
 
 printf "Execute migr-init... "
