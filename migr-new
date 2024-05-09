@@ -60,7 +60,7 @@ if [ "$title" != "$(printf "%s" "$title" | sed 's/[^a-z0-9_]//g;')" ]; then
 fi
 
 # Create a new migration file
-new_up_file=$dir/$tstamp-$id-$title.up.sql
-new_down_file=$dir/$tstamp-$id-$title.down.sql
+new_up_file=$dir/$tstamp-$id-$title-up.sql
+new_down_file=$dir/$tstamp-$id-$title-down.sql
 touch "$new_up_file" "$new_down_file"
 echo "Creating a new migration file: $new_up_file $new_down_file" 1>&2
