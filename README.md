@@ -61,7 +61,19 @@ migr-status   ........................ print migr's status
 
 # Install
 
-copy `migr-init` `migr-new` `migr-up` `migr-cancel` and `migr-status` to your project
+copy `migr-init` `migr-new` `migr-up` `migr-cancel` and `migr-status` to your project directory.
+
+Small script below can help your installation
+
+```sh
+#!/bin/sh
+
+wget https://github.com/ppdx999/migr/archive/main.zip
+unzip main.zip
+cp -r migr-main/migr-* .
+rm -rf migr-main main.zip
+chmod +x migr-*
+```
 
 # Warning
 
