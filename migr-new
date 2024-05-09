@@ -63,5 +63,12 @@ fi
 new_up_file=$dir/$tstamp-$id-$title-up.sql
 new_down_file=$dir/$tstamp-$id-$title-down.sql
 touch "$new_up_file" "$new_down_file"
-echo "Creating a new migration file: $new_up_file"   1>&2
-echo "Creating a new migration file: $new_down_file" 1>&2
+
+# print human-readable messages if the output is a terminal
+# otherwise, print the file names
+if [ -t 1 ]; then
+  echo "Creating a new migration file: $new_up_file"
+  echo "Creating a new migration file: $new_down_file"
+else
+  echo "$new_up_file" "$new_down_file"
+fi
