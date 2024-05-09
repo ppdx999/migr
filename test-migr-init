@@ -8,9 +8,6 @@ export PATH="$(command -p getconf PATH 2>/dev/null)${PATH+:}${PATH-}"
 case $PATH in :*) PATH=${PATH#?};; esac
 export UNIX_STD=2003  # to make HP-UX conform to POSIX
 
-tmp=migr-test-$$
-trap 'rm -rf $tmp' 0 1 2 3 15
-
 ok() { echo "ok" ; }
 ng() { echo "ng" ; exit 1 ; }
 
@@ -23,11 +20,17 @@ user=$(whoami)
 PGPASSWORD=password \
 psql  -U $user --host=localhost --port=5432 -d test_migr -c 'drop table migr;'
 
+# remove the directory
+rm -rf migr
+
+#=====================================================================
+printf "Testing migr-init"
+#=====================================================================
+
 printf "Execute migr-init... "
 
 ./migr-init \
     psql \
-    --dir=$tmp \
     --host=$host \
     --port=$port \
     --dbname=$dbname \
@@ -83,6 +86,6 @@ count=$(PGPASSWORD=password psql \
 [ $count -eq 1 ] || ng ; ok
 
 
-printf "Checking if the directory $tmp exists... "
+printf "Checking if the directory migr exists... "
 
-[ -d $tmp ] || ng ; ok
+[ -d migr ] || ng ; ok
