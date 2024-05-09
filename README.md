@@ -59,9 +59,17 @@ migr-cancel   ........................ cancel the most latest migration
 migr-status   ........................ print migr's status
 ```
 
+# Install
+
+copy `migr-init` `migr-new` `migr-up` `migr-cancel` and `migr-status` to your project
+
 # Warning
 
-`migr` only support postgresql for now.
+`migr` only support postgresql for now
+
+# Requirement
+
+This software run on posix environment
 
 # License
 
