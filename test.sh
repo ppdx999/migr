@@ -253,3 +253,105 @@ output=$(./migr-status \
 echo $output            |
 head -n 1               |
 grep -q "Not applied migrations"   || ng; ok
+
+
+printf "=============================================================\n"
+printf "Testing more complex migrations\n"
+printf "=============================================================\n"
+
+printf "New migrations... "
+
+alter_user_mig_files=$(./migr-new alter_user_table)
+
+alter_user_up_mig_files=$(echo $alter_user_mig_files | awk '{print $1}')
+alter_user_down_mig_files=$(echo $alter_user_mig_files | awk '{print $2}')
+
+[ -f $alter_user_up_mig_files ]   || ng
+[ -f $alter_user_down_mig_files ] || ng
+
+ok
+
+cat > "$alter_user_up_mig_files" <<EOF
+ALTER TABLE users ADD COLUMN age INT;
+EOF
+
+cat > "$alter_user_down_mig_files" <<EOF
+ALTER TABLE users DROP COLUMN age;
+EOF
+
+
+printf "Execute migr-up... "
+
+./migr-up \
+    psql \
+    --host=$host \
+    --port=$port \
+    --dbname=$dbname \
+    --user=$user \
+    --password=password 2>/dev/null 1>/dev/null
+
+[ $? -eq 1 ] || ng ; ok
+
+printf "Checking if the table users has the column age... "
+
+count=$(PGPASSWORD=password psql \
+    -Atq \
+    -U $user \
+    --host=$host \
+    --port=$port \
+    -d $dbname \
+    -c 'SELECT count(*) FROM information_schema.columns WHERE table_name = '\''users'\'' AND column_name = '\''age'\'';' )
+
+[ $count -eq 1 ] || ng ; ok
+
+printf "Testing migr-status should return 'Database is up to date'... "
+
+output=$(./migr-status \
+    psql \
+    --host=$host \
+    --port=$port \
+    --dbname=$dbname \
+    --user=$user \
+    --password=password)
+
+[ $? -eq 0 ] || ng
+
+[ "$output" = "Database is up to date" ] || ng; ok
+
+
+printf "Execute migr-cancel... "
+
+./migr-cancel \
+    psql \
+    --host=$host \
+    --port=$port \
+    --dbname=$dbname \
+    --user=$user \
+    --password=password 2>/dev/null 1>/dev/null
+
+[ $? -eq 1 ] || ng ; ok
+
+
+printf "Checking if the table users does not have the column age... "
+
+count=$(PGPASSWORD=password psql \
+    -Atq \
+    -U $user \
+    --host=$host \
+    --port=$port \
+    -d $dbname \
+    -c 'SELECT count(*) FROM information_schema.columns WHERE table_name = '\''users'\'' AND column_name = '\''age'\'';' )
+
+[ $count -eq 0 ] || ng ; ok
+
+printf "Checking if the table users exists in the database... "
+
+count=$(PGPASSWORD=password psql \
+    -Atq \
+    -U $user \
+    --host=$host \
+    --port=$port \
+    -d $dbname \
+    -c 'SELECT count(*) FROM information_schema.tables WHERE table_name = '\''users'\'';' )
+
+[ $count -eq 1 ] || ng ; ok
