@@ -62,3 +62,9 @@ migr-status   ........................ print migr's status
 # Warning
 
 `migr` only support postgresql for now.
+
+# License
+
+Complete Public-Domain Software (CC0)
+
+It means that all of the people can use this for any purposes with no restrictions at all. By the way, We are fed up with the side effects which are brought about by the major licenses.

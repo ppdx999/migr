@@ -1,5 +1,26 @@
 #!/bin/sh
 
+######################################################################
+#
+# migr - A simple and small migration tool for SQL databases
+#
+# migr-init ..... initialize the migration table
+#
+# Docuemnt is available at https://github.com/ppdx999/migr/blob/main/README.md
+#
+# Written by fujis (ppdx999@gmail) on 2024-05-02
+#
+# This is a public-domain software (CC0). It means that all of the
+# people can use this for any purposes with no restrictions at all.
+# By the way, We are fed up with the side effects which are brought
+# about by the major licenses.
+#
+# The latest version is distributed at the following page.
+# https://github.com/ppdx999/migr
+#
+#
+######################################################################
+
 # --- Initialize -----------------------------------------------------
 set -u
 umask 0022
