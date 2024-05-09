@@ -128,3 +128,58 @@ printf "Execute migr-up... "
     --password=password 2>/dev/null 1>/dev/null
 
 [ $? -eq 1 ] || ng ; ok
+
+
+printf "Checking if the table users exists in the database... "
+
+count=$(PGPASSWORD=password psql \
+    -Atq \
+    -U $user \
+    --host=$host \
+    --port=$port \
+    -d $dbname \
+    -c 'SELECT count(*) FROM information_schema.tables WHERE table_name = '\''users'\'';' )
+
+[ $count -eq 1 ] || ng ; ok
+
+printf "Checking if the table users has the columns id, name, email and created_at... "
+
+count=$(PGPASSWORD=password psql \
+    -Atq \
+    -U $user \
+    --host=$host \
+    --port=$port \
+    -d $dbname \
+    -c 'SELECT count(*) FROM information_schema.columns WHERE table_name = '\''users'\'' AND column_name = '\''id'\'';' )
+
+[ $count -eq 1 ] || ng
+
+count=$(PGPASSWORD=password psql \
+    -Atq \
+    -U $user \
+    --host=$host \
+    --port=$port \
+    -d $dbname \
+    -c 'SELECT count(*) FROM information_schema.columns WHERE table_name = '\''users'\'' AND column_name = '\''name'\'';' )
+
+[ $count -eq 1 ] || ng
+
+count=$(PGPASSWORD=password psql \
+    -Atq \
+    -U $user \
+    --host=$host \
+    --port=$port \
+    -d $dbname \
+    -c 'SELECT count(*) FROM information_schema.columns WHERE table_name = '\''users'\'' AND column_name = '\''email'\'';' )
+
+[ $count -eq 1 ] || ng
+
+count=$(PGPASSWORD=password psql \
+    -Atq \
+    -U $user \
+    --host=$host \
+    --port=$port \
+    -d $dbname \
+    -c 'SELECT count(*) FROM information_schema.columns WHERE table_name = '\''users'\'' AND column_name = '\''created_at'\'';' )
+
+[ $count -eq 1 ] || ng ; ok
