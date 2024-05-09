@@ -89,3 +89,24 @@ count=$(PGPASSWORD=password psql \
 printf "Checking if the directory migr exists... "
 
 [ -d migr ] || ng ; ok
+
+printf "=============================================================\n"
+printf "Testing migr-new\n"
+printf "=============================================================\n"
+
+printf "Execute migr-new... "
+
+create_user_mig_files=$(./migr-new create_user)
+
+ok
+
+printf "Checking if the up and down migration files exist... "
+
+create_user_up_mig_files=$(echo $create_user_mig_files | awk '{print $1}')
+create_user_down_mig_files=$(echo $create_user_mig_files | awk '{print $2}')
+
+
+[ -f $create_user_up_mig_files ]   || ng
+[ -f $create_user_down_mig_files ] || ng
+
+ok
