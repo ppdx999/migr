@@ -19,6 +19,10 @@ port=5432
 dbname=test_migr
 user=$(whoami)
 
+# reset-table
+PGPASSWORD=password \
+psql  -U $user --host=localhost --port=5432 -d test_migr -c 'drop table migr;'
+
 printf "Execute migr-init... "
 
 ./migr-init \
@@ -45,7 +49,7 @@ count=$(PGPASSWORD=password psql \
 [ $count -eq 1 ] || ng ; ok
 
 
-printf "Checking if the table migr has the columns id and created_at... "
+printf "Checking if the table migr has the columns id, is_applied and created_at... "
 
 count=$(PGPASSWORD=password psql \
     -Atq \
@@ -54,6 +58,17 @@ count=$(PGPASSWORD=password psql \
     --port=$port \
     -d $dbname \
     -c 'SELECT count(*) FROM information_schema.columns WHERE table_name = '\''migr'\'' AND column_name = '\''id'\'';' )
+
+[ $count -eq 1 ] || ng
+
+
+count=$(PGPASSWORD=password psql \
+    -Atq \
+    -U $user \
+    --host=$host \
+    --port=$port \
+    -d $dbname \
+    -c 'SELECT count(*) FROM information_schema.columns WHERE table_name = '\''migr'\'' AND column_name = '\''is_applied'\'';' )
 
 [ $count -eq 1 ] || ng
 
