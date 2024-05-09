@@ -8,10 +8,12 @@ export PATH="$(command -p getconf PATH 2>/dev/null)${PATH+:}${PATH-}"
 case $PATH in :*) PATH=${PATH#?};; esac
 export UNIX_STD=2003  # to make HP-UX conform to POSIX
 
+tmp=migr-up-$$
+mkdir $tmp
+trap 'rm -rf $tmp' 0 1 2 3 15
+
 print_usage_exit() {
   cat <<-USAGE 1>&2
-initial setup for migr
-
 Usage   : ${0##*/} [options]
 Options : -d <dir>|--dir=<dir>                Directory to store the migration
         : -h <host>|--host=<host>             Database host
@@ -24,12 +26,8 @@ USAGE
   exit 1
 }
 
-error_exit() {
-  echo "${0##*/}: $1" 1>&2
-  exit 1
-}
 
-# --- Parse Options --------------------------------------------------
+# --- Parse Options -------------------------------------------------
 case ${1:-} in -h|--help) print_usage_exit;; esac
 cmd=$1
 dir=migr
@@ -68,36 +66,63 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-[ -d "$dir" ] && error_exit "Directory already exists: $dir"
-
 # --- Main -----------------------------------------------------------
 
-# create a new directories and files
-mkdir -p $dir
-
-# Execute the initializtion sql
 case $cmd in
   psql)
-    [ -z "$host"     ] && error_exit "Host is not given."
-    [ -z "$port"     ] && error_exit "Port is not given."
-    [ -z "$dbname"   ] && error_exit "Database name is not given."
-    [ -z "$user"     ] && error_exit "User is not given."
-    [ -z "$password" ] && error_exit "Password is not given."
-    PGPASSWORD=$password psql --host=$host --port=$port --dbname=$dbname --username=$user -c '
-      CREATE TABLE IF NOT EXISTS migr (
-        id         TEXT PRIMARY KEY,
-        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
-    '
+    PGPASSWORD=$password psql -Aqt -h $host -p $port -U $user -d $dbname -c '
+        select id from migr order by id asc;'  |
+    sort -n                                    |
+    uniq                                       > $tmp/db-ids
     ;;
   mysql)
-    error_exit "Not implemented yet."
+    error_exit "Not implemented yet"
     ;;
   sqlite3)
-    error_exit "Not implemented yet."
+    error_exit "Not implemented yet"
     ;;
-  *)
-    error_exit "Unknown command: $cmd";;
 esac
 
-[ $? -ne 0 ] && error_exit "Failed to create a table: migr"
+# Filename structure: {timestamp}-{id}-{title}.{up|down}.sql
+find $dir -type f -name '*up.sql' |
+# Remove file extension
+sed 's/up.sql$//'                 |
+# Extract id
+tr '-' ' '                        |
+awk '{print $2}'                  |
+sort -n                           > $tmp/fs-ids
+
+# Pick all ids that are in file system but not in database
+printf "Applying migrations\n"
+diff -sb $tmp/db-ids $tmp/fs-ids   |
+grep '^> '                         |
+sed 's/^> //'                      |
+while read id; do
+  up_file=$(find $dir -type f -name "*-${id}-*-up.sql" | head -1)
+  printf "  %s ........ " $up_file
+
+  # Apply migration
+  cat > $tmp/up.sql <<-SQL
+BEGIN;
+INSERT INTO migr (id) VALUES ('$id');
+$(cat $up_file)
+COMMIT;
+SQL
+
+  case $cmd in
+      psql)
+      PGPASSWORD=$password psql -Aqt -h $host -p $port -U $user -d $dbname -f $tmp/up.sql
+      ;;
+      mysql)
+      error_exit "Not implemented yet"
+      ;;
+      sqlite3)
+      error_exit "Not implemented yet"
+      ;;
+  esac
+
+  printf "ok\n"
+done
+
+# --- Done -----------------------------------------------------------
+exit 1

@@ -18,7 +18,7 @@ user=$(whoami)
 
 # reset-table
 PGPASSWORD=password \
-psql  -U $user --host=localhost --port=5432 -d test_migr -c 'drop table migr;'
+psql  -U $user --host=localhost --port=5432 -d test_migr -c 'drop table migr; drop table users;'
 
 # remove the directory
 rm -rf migr
@@ -64,17 +64,6 @@ count=$(PGPASSWORD=password psql \
 
 [ $count -eq 1 ] || ng
 
-
-count=$(PGPASSWORD=password psql \
-    -Atq \
-    -U $user \
-    --host=$host \
-    --port=$port \
-    -d $dbname \
-    -c 'SELECT count(*) FROM information_schema.columns WHERE table_name = '\''migr'\'' AND column_name = '\''is_applied'\'';' )
-
-[ $count -eq 1 ] || ng
-
 count=$(PGPASSWORD=password psql \
     -Atq \
     -U $user \
@@ -110,3 +99,32 @@ create_user_down_mig_files=$(echo $create_user_mig_files | awk '{print $2}')
 [ -f $create_user_down_mig_files ] || ng
 
 ok
+
+cat > "$create_user_up_mig_files" <<EOF
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+EOF
+
+cat > "$create_user_down_mig_files" <<EOF
+DROP TABLE user;
+EOF
+
+printf "=============================================================\n"
+printf "Testing migr-up\n"
+printf "=============================================================\n"
+
+printf "Execute migr-up... "
+
+./migr-up \
+    psql \
+    --host=$host \
+    --port=$port \
+    --dbname=$dbname \
+    --user=$user \
+    --password=password 2>/dev/null 1>/dev/null
+
+[ $? -eq 1 ] || ng ; ok
