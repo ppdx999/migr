@@ -8,6 +8,10 @@ export PATH="$(command -p getconf PATH 2>/dev/null)${PATH+:}${PATH-}"
 case $PATH in :*) PATH=${PATH#?};; esac
 export UNIX_STD=2003  # to make HP-UX conform to POSIX
 
+tmp=migr-test-$$
+mkdir $tmp
+trap 'rm -rf $tmp' 0 1 2 3 15
+
 ok() { echo "ok" ; }
 ng() { echo "ng" ; exit 1 ; }
 
@@ -185,6 +189,24 @@ count=$(PGPASSWORD=password psql \
 [ $count -eq 1 ] || ng ; ok
 
 printf "=============================================================\n"
+printf "Testing migr-status\n"
+printf "=============================================================\n"
+
+printf "Execute migr-status... "
+
+output=$(./migr-status \
+    psql \
+    --host=$host \
+    --port=$port \
+    --dbname=$dbname \
+    --user=$user \
+    --password=password)
+
+[ $? -eq 0 ] || ng
+
+[ "$output" = "Database is up to date" ] || ng; ok
+
+printf "=============================================================\n"
 printf "Testing migr-cancel\n"
 printf "=============================================================\n"
 
@@ -211,3 +233,23 @@ count=$(PGPASSWORD=password psql \
     -c 'SELECT count(*) FROM information_schema.tables WHERE table_name = '\''users'\'';' )
 
 [ $count -eq 0 ] || ng ; ok
+
+printf "=============================================================\n"
+printf "Testing migr-status\n"
+printf "=============================================================\n"
+
+printf "Execute migr-status... "
+
+output=$(./migr-status \
+    psql \
+    --host=$host \
+    --port=$port \
+    --dbname=$dbname \
+    --user=$user \
+    --password=password)
+
+[ $? -eq 0 ] || ng
+
+echo $output            |
+head -n 1               |
+grep -q "Not applied migrations"   || ng; ok

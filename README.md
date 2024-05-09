@@ -61,23 +61,5 @@ migr-init     ........................ initial setup for migr
 migr-new      ........................ create new migration file
 migr-up       ........................ upgrade your database to the latest
 migr-cancel   ........................ cancel the most latest migration
-migr-outdated ........................ check your database is latest or not
+migr-status   ........................ print difference between fs and db
 ```
-
-## migr-init
-
-- create migration management table to your database.
-- create a dir locally to store migration files.
-
-## migr-new
-
-- create new migration file
-- its file name structure is `{timestamp}_{id}_{up|down}_{title}.sql`
-
-## migr-up
-
-- upgrade your database to the latest
-
-## migr-redo
-
-- apply latest down-migration, then apply latest up-migration
