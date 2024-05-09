@@ -11,16 +11,17 @@ Suppose that you use postgres
 Initialize migr by `migr-init` command.
 
 ```
-$ migr-init -u postgres -d testdb -p 5432 -h localhost
+$ migr-init psql --dbname=testdb
 ```
 
 Create new migraiton file and edit the file.
 
 ```
-$ migr-new   create-user-table
-create new user table at ./migr/migrations/cakstjdq2a-create-user-table.sql
+$ migr-new create_user
+create new user table at ./migr/1715215123-9o7di3gts3-create_user-up.sql
+create new user table at ./migr/1715215123-9o7di3gts3-create_user-down.sql
 
-$ vim ./migr/migrations/cakstjdq2a-create-user-table.sql
+$ vim ./migr/1715215123-9o7di3gts3-create_user-up.sql
 CREATE TABLE IF NOT EXISTS user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
@@ -30,18 +31,12 @@ CREATE TABLE IF NOT EXISTS user (
 );
 ```
 
-Commit the new migration file to master file.
-
-```
-$ migr-commit cakstjdq2a
-```
-
 Update your database according to the master file
 
 ```
-$ migr-apply -u postgres -d testdb -p 5432 -h localhost
+$ migr-up psql -dbname=testdb
 apply new migrations
-cakstjdq2a create-user-table.sql ................. ok
+1715215123 9o7di3gts3 create_user ................ ok
 ```
 
 # Why?
@@ -62,10 +57,12 @@ If your response to all these inquiries is a resounding "yes," then migr might n
 migr have 4 basic operation commands.
 
 ```txt
-migr-init    ......................... initial setup for migr
-migr-new     ......................... create new migration file
-migr-up      ......................... upgrade your database to the latest
-migr-redo    ......................... redo latest migration
+migr-init     ........................ initial setup for migr
+migr-new      ........................ create new migration file
+migr-up       ........................ upgrade your database to the latest
+migr-amend    ........................ cancel the most latest migration
+migr-redo     ........................ redo latest migration
+migr-outdated ........................ check your database is latest or not
 ```
 
 ## migr-init
