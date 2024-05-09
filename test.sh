@@ -41,7 +41,7 @@ printf "Execute migr-init... "
     --user=$user \
     --password=password 2>/dev/null 1>/dev/null
 
-[ $? -eq 1 ] || ng ; ok
+[ $? -eq 0 ] || ng ; ok
 
 printf "Checking if the table migr exists in the database... "
 
@@ -131,7 +131,7 @@ printf "Execute migr-up... "
     --user=$user \
     --password=password 2>/dev/null 1>/dev/null
 
-[ $? -eq 1 ] || ng ; ok
+[ $? -eq 0 ] || ng ; ok
 
 
 printf "Checking if the table users exists in the database... "
@@ -220,7 +220,7 @@ printf "Execute migr-cancel... "
     --user=$user \
     --password=password 2>/dev/null 1>/dev/null
 
-[ $? -eq 1 ] || ng ; ok
+[ $? -eq 0 ] || ng ; ok
 
 printf "Checking if the table users does not exist in the database... "
 
@@ -290,7 +290,7 @@ printf "Execute migr-up... "
     --user=$user \
     --password=password 2>/dev/null 1>/dev/null
 
-[ $? -eq 1 ] || ng ; ok
+[ $? -eq 0 ] || ng ; ok
 
 printf "Checking if the table users has the column age... "
 
@@ -329,7 +329,7 @@ printf "Execute migr-cancel... "
     --user=$user \
     --password=password 2>/dev/null 1>/dev/null
 
-[ $? -eq 1 ] || ng ; ok
+[ $? -eq 0 ] || ng ; ok
 
 
 printf "Checking if the table users does not have the column age... "

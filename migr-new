@@ -72,3 +72,6 @@ if [ -t 1 ]; then
 else
   echo "$new_up_file" "$new_down_file"
 fi
+
+# --- Finish ---------------------------------------------------------
+exit 0

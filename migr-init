@@ -99,3 +99,6 @@ case $cmd in
 esac
 
 [ $? -ne 0 ] && error_exit "Failed to create a table: migr"
+
+# --- Finish ---------------------------------------------------------
+exit 0
