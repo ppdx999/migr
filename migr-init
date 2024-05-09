@@ -86,6 +86,7 @@ case $cmd in
     PGPASSWORD=$password psql --host=$host --port=$port --dbname=$dbname --username=$user -c '
       CREATE TABLE IF NOT EXISTS migr (
         id         TEXT PRIMARY KEY,
+        is_applied BOOLEAN NOT NULL DEFAULT FALSE,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
     '
